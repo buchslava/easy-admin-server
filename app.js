@@ -1,3 +1,4 @@
+const Database = require('sqlite-async');
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
@@ -7,10 +8,22 @@ const exjwt = require('express-jwt');
 const jwtMW = exjwt({ secret: 'my-secret' });
 const app = express();
 
+const config = require("./config");
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.set('port', process.env.PORT || 3001);
+
+let db;
+
+(async () => {
+  try {
+    db = await Database.open("test.db");
+  } catch (e) {
+    console.log(e);
+  }
+})();
 
 app.post('/login', (req, res) => {
   const content = req.body;
@@ -60,6 +73,20 @@ app.get('/data', jwtMW, (req, res) => {
     data
   });
 });
+
+app.get('/global-config', jwtMW, async (req, res) => {
+  const data = config.menu.map(item => {
+    const {id, label, columns} = item;
+    return { id, label, columns };
+  })
+  res.status(200).send(data);
+});
+
+/*app.get('/data1', jwtMW, async (req, res) => {
+  const r = await db.all(`SELECT rowid, name FROM category`);
+  console.log(r);
+  res.status(200).send("ok");
+});*/
 
 app.use((err, req, res, next) => {
   if (err.name === 'UnauthorizedError') {
