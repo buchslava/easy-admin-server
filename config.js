@@ -38,7 +38,7 @@ module.exports = {
       ],
       createSQL: () => `CREATE TABLE goods(name TEXT, price NUMERIC(10,2), categoryId INT)`,
       insertSQL: (p) => `INSERT INTO goods VALUES ('${p.name}', ${p.price}, ${p.categoryId})`,
-      selectSQL: (p) => `SELECT goods.rowid, name, price, category.rowid, categoryId FROM goods, category WHERE category.rowid = categoryId`,
+      selectSQL: (p) => `SELECT goods.rowid, goods.name, price, category.rowid, categoryId FROM goods, category WHERE category.rowid = categoryId`,
       updateSQL: (p) => `UPDATE goods SET name='${p.name}', price=${p.price}, category=${p.category} WHERE rowid=${p.rowid}`,
       deleteSQL: (p) => `DELETE FROM goods WHERE rowid=${p.rowid}`,
       initData: [],

@@ -42,51 +42,21 @@ app.get('/logout', (req, res) => {
   res.status(200).send("ok");
 });
 
-app.get('/data', jwtMW, (req, res) => {
-  const data = [];
-
-  for (let i = 0; i < 100; i++) {
-    data.push({
-      key: i,
-      name: `Edward King ${i}`,
-      age: 32,
-      address: `London, Park Lane no. ${i}`,
-    });
-  }
-
-  res.json({
-    columns: [
-      {
-        title: 'Name',
-        dataIndex: 'name',
-        width: 150,
-      },
-      {
-        title: 'Age',
-        dataIndex: 'age',
-        width: 150,
-      },
-      {
-        title: 'Address',
-        dataIndex: 'address',
-      }],
-    data
-  });
-});
-
 app.get('/global-config', jwtMW, async (req, res) => {
   const data = config.menu.map(item => {
-    const {id, label, columns} = item;
+    const { id, label, columns } = item;
     return { id, label, columns };
   })
   res.status(200).send(data);
 });
 
-/*app.get('/data1', jwtMW, async (req, res) => {
-  const r = await db.all(`SELECT rowid, name FROM category`);
-  console.log(r);
-  res.status(200).send("ok");
-});*/
+app.get('/data/:screen', jwtMW, async (req, res) => {
+  const screenId = req.params.screen;
+  const currentScreenObj = config.menu.find(item => item.id === screenId);
+  const { label, columns } = currentScreenObj;
+  const rows = await db.all(currentScreenObj.selectSQL());
+  res.status(200).send({ label, columns, rows });
+});
 
 app.use((err, req, res, next) => {
   if (err.name === 'UnauthorizedError') {
