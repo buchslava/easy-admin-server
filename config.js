@@ -6,7 +6,9 @@ module.exports = {
       columns: [
         {
           id: "name",
-          label: "Name"
+          label: "Name",
+          type: "text",
+          rules: [{ required: true, message: "Please input a name!", whitespace: true }],
         }
       ],
       createSQL: () => `CREATE TABLE category(name TEXT)`,
@@ -24,7 +26,9 @@ module.exports = {
       columns: [
         {
           id: "name",
-          label: "Name"
+          label: "Name",
+          type: "text",
+          rules: [{ required: true, message: "Please input a name!", whitespace: true }],
         },
         {
           id: "price",
@@ -34,6 +38,7 @@ module.exports = {
         {
           id: "categoryId",
           label: "Category",
+          type: "dropdown",
           relation: `category`
         }
       ],
