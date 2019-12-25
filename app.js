@@ -67,6 +67,15 @@ app.post('/insert/:screen', jwtMW, async (req, res) => {
   res.status(200).send({ ...record });
 });
 
+app.get('/delete/:screen/:rowid', jwtMW, async (req, res) => {
+  const screenId = req.params.screen;
+  const rowid = req.params.rowid;
+  const currentScreenObj = config.menu.find(item => item.id === screenId);
+  console.log(currentScreenObj.deleteSQL({rowid}));
+  await db.run(currentScreenObj.deleteSQL({rowid}));
+  res.status(200).send({});
+});
+
 app.use((err, req, res, next) => {
   if (err.name === 'UnauthorizedError') {
     res.status(401).send(err);
