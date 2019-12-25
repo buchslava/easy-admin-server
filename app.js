@@ -50,12 +50,21 @@ app.get('/global-config', jwtMW, async (req, res) => {
   res.status(200).send(data);
 });
 
-app.get('/data/:screen', jwtMW, async (req, res) => {
+app.get('/select/:screen', jwtMW, async (req, res) => {
   const screenId = req.params.screen;
   const currentScreenObj = config.menu.find(item => item.id === screenId);
   const { label, columns } = currentScreenObj;
   const rows = await db.all(currentScreenObj.selectSQL());
   res.status(200).send({ label, columns, rows });
+});
+
+app.post('/insert/:screen', jwtMW, async (req, res) => {
+  const screenId = req.params.screen;
+  const currentScreenObj = config.menu.find(item => item.id === screenId);
+  await db.get(currentScreenObj.insertSQL(req.body));
+  const { rowid } = await db.get(`SELECT last_insert_rowid() AS rowid`);
+  const record = await db.get(currentScreenObj.recordSQL({rowid}));
+  res.status(200).send({ ...record });
 });
 
 app.use((err, req, res, next) => {
