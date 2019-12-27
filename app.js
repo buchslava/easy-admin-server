@@ -89,6 +89,18 @@ app.get('/delete/:screen/:rowid', jwtMW, async (req, res) => {
   res.status(200).send({});
 });
 
+app.post('/relations', jwtMW, async (req, res) => {
+  // const actions = [];
+  for (const relation of req.body) {
+    const relationScreenObj = config.menu.find(item => item.id === relation);
+    console.log(relationScreenObj.relateSQL());
+    /*actions.push(() => {
+      db.get(relationScreenObj.relateSQL())
+    });*/
+  }
+  res.status(200).send({ ...req.body });
+});
+
 app.use((err, req, res, next) => {
   if (err.name === 'UnauthorizedError') {
     res.status(401).send(err);

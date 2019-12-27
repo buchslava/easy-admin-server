@@ -14,6 +14,7 @@ module.exports = {
       createSQL: () => `CREATE TABLE category(name TEXT)`,
       insertSQL: (p) => `INSERT INTO category VALUES ('${p.name}')`,
       selectSQL: (p) => `SELECT rowid, name FROM category ORDER BY rowid`,
+      relateSQL: (p) => `SELECT rowid, name FROM category ORDER BY rowid`,
       recordSQL: (p) => `SELECT rowid, name FROM category WHERE rowid=${p.rowid}`,
       updateSQL: (p) => `UPDATE category SET name='${p.name}' WHERE rowid=${p.rowid}`,
       deleteSQL: (p) => `DELETE FROM category WHERE rowid=${p.rowid}`,
