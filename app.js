@@ -51,10 +51,18 @@ app.get('/global-config', jwtMW, async (req, res) => {
 });
 
 app.get('/select/:screen', jwtMW, async (req, res) => {
-  const screenId = req.params.screen;
-  const currentScreenObj = config.menu.find(item => item.id === screenId);
+  const { screen } = req.params;
+  const currentScreenObj = config.menu.find(item => item.id === screen);
   const { label, columns } = currentScreenObj;
   const rows = await db.all(currentScreenObj.selectSQL());
+  res.status(200).send({ label, columns, rows });
+});
+
+app.get('/record/:screen/:rowid', jwtMW, async (req, res) => {
+  const { screen, rowid } = req.params;
+  const currentScreenObj = config.menu.find(item => item.id === screen);
+  const { label, columns } = currentScreenObj;
+  const rows = await db.get(currentScreenObj.recordSQL({ rowid }));
   res.status(200).send({ label, columns, rows });
 });
 
@@ -63,16 +71,21 @@ app.post('/insert/:screen', jwtMW, async (req, res) => {
   const currentScreenObj = config.menu.find(item => item.id === screenId);
   await db.get(currentScreenObj.insertSQL(req.body));
   const { rowid } = await db.get(`SELECT last_insert_rowid() AS rowid`);
-  const record = await db.get(currentScreenObj.recordSQL({rowid}));
+  const record = await db.get(currentScreenObj.recordSQL({ rowid }));
   res.status(200).send({ ...record });
 });
 
+app.post('/update/:screen/:rowid', jwtMW, async (req, res) => {
+  const { screen, rowid } = req.params;
+  const currentScreenObj = config.menu.find(item => item.id === screen);
+  await db.run(currentScreenObj.updateSQL({ ...req.body, rowid }));
+  res.status(200).send({ ...req.body, rowid });
+});
+
 app.get('/delete/:screen/:rowid', jwtMW, async (req, res) => {
-  const screenId = req.params.screen;
-  const rowid = req.params.rowid;
-  const currentScreenObj = config.menu.find(item => item.id === screenId);
-  console.log(currentScreenObj.deleteSQL({rowid}));
-  await db.run(currentScreenObj.deleteSQL({rowid}));
+  const { screen, rowid } = req.params;
+  const currentScreenObj = config.menu.find(item => item.id === screen);
+  await db.run(currentScreenObj.deleteSQL({ rowid }));
   res.status(200).send({});
 });
 
